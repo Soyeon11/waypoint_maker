@@ -1,0 +1,9 @@
+<launch>
+
+	<arg name="state_inspection" default="0" />
+
+	<node name="waypoint_loader_node" pkg="waypoint_maker" type="waypoint_loader" output="screen">
+		<param name="state_inspection" value="$(arg state_inspection)" />
+	</node>
+
+</launch>
