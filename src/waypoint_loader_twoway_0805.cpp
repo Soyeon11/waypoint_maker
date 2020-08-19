@@ -3,6 +3,7 @@
 #include <waypoint_maker/Waypoint.h>
 #include <waypoint_maker/State.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <vector>
 
 #include <fstream>
@@ -76,7 +77,7 @@ public:
 		getNewWaypoints();
 
 		waypoint_pub_ = nh_.advertise<waypoint_maker::Lane>("final_waypoints", 1);
-		pose_sub_ = nh_.subscribe("current_pose", 10, &WaypointLoader::poseCallback, this);
+		pose_sub_ = nh_.subscribe("odom", 10, &WaypointLoader::poseCallback, this);
 		state_sub_ = nh_.subscribe("target_state",10, &WaypointLoader::stateCallback,this);
 		lane_number_ = 0;
 		ex_lane_number_ = 0;
@@ -88,10 +89,12 @@ public:
 		lane_number_ = msg->lane_number;
 	}
 
-	void poseCallback(const geometry_msgs::PoseStamped::ConstPtr &msg) {
+	void poseCallback(const nav_msgs::Odometry::ConstPtr &msg) {
 		final_waypoints_.clear();
+		geometry_msgs::PoseStamped current_pose;
+		current_pose.pose.position = msg->pose.pose.position;
 
-		getClosestWaypoint(*msg);
+		getClosestWaypoint(current_pose);
 
 		ROS_INFO("CLOSEST WAYPOINT INDEX=%d, X=%f, Y=%f", closest_waypoint_, new_waypoints_[closest_waypoint_].pose.pose.position.x, new_waypoints_[closest_waypoint_].pose.pose.position.y);
 	
@@ -114,7 +117,7 @@ public:
 	void get_csvs_inDirectory()
 	{
 	
-		DIR* dirp = opendir("/home/so-yeon/data/");
+		DIR* dirp = opendir("/home/menu/data/");
 		struct dirent* dp;
 		
 		if (dirp == NULL){
@@ -125,7 +128,7 @@ public:
 
 
 		while((dp = readdir(dirp)) != NULL){
-			string address("/home/so-yeon/data/");
+			string address("/home/menu/data/");
 
 			string filename (dp->d_name);
 

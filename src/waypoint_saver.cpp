@@ -5,6 +5,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <tf/transform_datatypes.h>
+#include <nav_msgs/Odometry.h>
 
 #include <fstream>
 #include <string>
@@ -53,15 +54,15 @@ public:
 
 		count_ = 0;
 
-		pose_sub_ = nh_.subscribe("current_pose", 10, &WaypointSaver::PoseCallback, this);
+		pose_sub_ = nh_.subscribe("odom", 10, &WaypointSaver::PoseCallback, this);
 	
-		os_.open("/home/so-yeon/data.csv", ios::app);
+		os_.open("/home/menu/data.csv", ios::app);
 		os_<<setprecision(numeric_limits<double>::digits10+2);
 	}
 	
-	void PoseCallback(const geometry_msgs::PoseStamped::ConstPtr &pose_msg) {
-		xpos_ = pose_msg->pose.position.x;
-		ypos_ = pose_msg->pose.position.y;
+	void PoseCallback(const nav_msgs::Odometry::ConstPtr &odom_msg) {
+		xpos_ = odom_msg->pose.pose.position.x;
+		ypos_ = odom_msg->pose.pose.position.y;
 	
 		geometry_msgs::Point cur_pose;
 		cur_pose.x = xpos_;
