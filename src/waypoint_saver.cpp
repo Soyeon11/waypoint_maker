@@ -56,7 +56,7 @@ public:
 
 		pose_sub_ = nh_.subscribe("odom", 10, &WaypointSaver::PoseCallback, this);
 	
-		os_.open("/home/menu/data.csv", ios::app);
+		os_.open("/home/so-yeon/data.csv", ios::app);
 		os_<<setprecision(numeric_limits<double>::digits10+2);
 	}
 	

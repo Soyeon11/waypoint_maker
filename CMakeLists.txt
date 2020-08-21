@@ -207,5 +207,5 @@ add_executable(waypoint_saver src/waypoint_saver.cpp)
 target_link_libraries(waypoint_saver ${catkin_LIBRARIES})
 
 
-add_executable(waypoint_loader src/waypoint_loader_twoway_0805.cpp)
+add_executable(waypoint_loader src/waypoint_loader_twoway_state.cpp)
 target_link_libraries(waypoint_loader ${catkin_LIBRARIES})

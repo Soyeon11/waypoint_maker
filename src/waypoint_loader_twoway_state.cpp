@@ -34,6 +34,9 @@ protected:
 	vector< vector<waypoint_maker::Waypoint> > all_new_waypoints_;
 	vector<waypoint_maker::Waypoint> new_waypoints_;
 	vector<int> lane_size_;
+	vector< vector<int> > all_state_index_;
+	vector<int> state_index_;
+
 	int size_;
 	int final_size_;
 	int state_inspection;	
@@ -165,6 +168,7 @@ public:
 			
 			vector<waypoint_maker::Waypoint> new_waypoints;
 			waypoint_maker::Waypoint temp_waypoint;
+			temp_waypoint.mission_state = 0;
 	
 			while(!is_.eof()) {
 				getline(is_, str_buf);
@@ -180,9 +184,13 @@ public:
 					string str_buf4 = str_buf3.substr(pos3+1);
 					pos4 = str_buf4.find(",");
 					temp_waypoint.twist.twist.linear.x = stof(str_buf4.substr(0, pos4));
+					if(temp_waypoint.mission_state != stof(str_buf4.substr(pos4+1))){
+					state_index_.push_back(temp_waypoint.waypoint_index);
+					}
 					temp_waypoint.mission_state = stof(str_buf4.substr(pos4+1));
-		
+					
 					new_waypoints.push_back(temp_waypoint);
+
 				}
 			}
 			is_.close();
@@ -193,6 +201,7 @@ public:
 			ROS_INFO("%d WAY POINTS HAVE BEEN SAVED.", size_);
 
 			all_new_waypoints_.push_back(new_waypoints);
+			all_state_index_.push_back(state_index_);
 			new_waypoints.clear();
 		}
 
@@ -207,12 +216,16 @@ public:
 		
 
 		if(lane_number_ != ex_lane_number_){
+			private_nh_.setParam("/waypoint_follower_node/lane_final", lane_number_);
+			private_nh_.setParam("/waypoint_follower_node/first_state_index", all_state_index_[lane_number_].at(0));
+			private_nh_.setParam("/waypoint_follower_node/second_state_index", all_state_index_[lane_number_].at(1));
+			private_nh_.setParam("/waypoint_follower_node/third_state_index", all_state_index_[lane_number_].at(2));
 			new_waypoints_.clear();
 			new_waypoints_.assign(all_new_waypoints_[lane_number_].begin(),all_new_waypoints_[lane_number_].end());
 			size_ = lane_size_[lane_number_];
 			ex_lane_number_ = lane_number_;
 			if(lane_number_ ==0){
-			state_inspection == 4;
+			state_inspection == 3;
 			}
 			else state_inspection == 0;
 		}
