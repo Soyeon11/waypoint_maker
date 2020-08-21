@@ -76,14 +76,15 @@ public:
 
 		closest_waypoint_ = 0;
 		
-		get_csvs_inDirectory();
-		getNewWaypoints();
-
 		waypoint_pub_ = nh_.advertise<waypoint_maker::Lane>("final_waypoints", 1);
 		pose_sub_ = nh_.subscribe("odom", 10, &WaypointLoader::poseCallback, this);
 		state_sub_ = nh_.subscribe("target_state",10, &WaypointLoader::stateCallback,this);
 		lane_number_ = 0;
+		cout << lane_number_ <<endl;
 		ex_lane_number_ = 0;
+
+		get_csvs_inDirectory();
+		getNewWaypoints();
 	
 	}
 	
@@ -203,11 +204,25 @@ public:
 			all_new_waypoints_.push_back(new_waypoints);
 			all_state_index_.push_back(state_index_);
 			new_waypoints.clear();
+			state_index_.clear();
 		}
 
 
 		new_waypoints_.assign(all_new_waypoints_[0].begin(),all_new_waypoints_[0].end());
 		size_ = lane_size_[0];
+		/*for (vector<int> vec : all_state_index_) {
+			for (int num : vec) {
+				cout << num <<" ";
+		}
+		cout << endl;
+
+		cout << all_state_index_.size() << endl;
+		//lane_number_ =0;
+		cout << lane_number_ << endl;*/
+
+		cout << all_state_index_.at(lane_number_).at(0) << endl;
+
+
 		
 
 	}
@@ -217,9 +232,9 @@ public:
 
 		if(lane_number_ != ex_lane_number_){
 			private_nh_.setParam("/waypoint_follower_node/lane_final", lane_number_);
-			private_nh_.setParam("/waypoint_follower_node/first_state_index", all_state_index_[lane_number_].at(0));
-			private_nh_.setParam("/waypoint_follower_node/second_state_index", all_state_index_[lane_number_].at(1));
-			private_nh_.setParam("/waypoint_follower_node/third_state_index", all_state_index_[lane_number_].at(2));
+			private_nh_.setParam("/waypoint_follower_node/first_state_index", all_state_index_.at(lane_number_).at(0));
+			private_nh_.setParam("/waypoint_follower_node/second_state_index", all_state_index_.at(lane_number_).at(0));
+			private_nh_.setParam("/waypoint_follower_node/third_state_index", all_state_index_.at(lane_number_).at(0));
 			new_waypoints_.clear();
 			new_waypoints_.assign(all_new_waypoints_[lane_number_].begin(),all_new_waypoints_[lane_number_].end());
 			size_ = lane_size_[lane_number_];
