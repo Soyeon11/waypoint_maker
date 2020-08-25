@@ -179,8 +179,7 @@ public:
 					temp_waypoint.pose.pose.position.y = stof(str_buf3.substr(0, pos3));
 					string str_buf4 = str_buf3.substr(pos3+1);
 					pos4 = str_buf4.find(",");
-					temp_waypoint.twist.twist.linear.x = stof(str_buf4.substr(0, pos4));
-					temp_waypoint.mission_state = stof(str_buf4.substr(pos4+1));
+					temp_waypoint.mission_state = stof(str_buf4.substr(0.pos4));
 		
 					new_waypoints.push_back(temp_waypoint);
 				}

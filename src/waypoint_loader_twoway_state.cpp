@@ -184,11 +184,10 @@ public:
 					temp_waypoint.pose.pose.position.y = stof(str_buf3.substr(0, pos3));
 					string str_buf4 = str_buf3.substr(pos3+1);
 					pos4 = str_buf4.find(",");
-					temp_waypoint.twist.twist.linear.x = stof(str_buf4.substr(0, pos4));
-					if(temp_waypoint.mission_state != stof(str_buf4.substr(pos4+1))){
+					if(temp_waypoint.mission_state != stof(str_buf4.substr(0,pos4))){
 					state_index_.push_back(temp_waypoint.waypoint_index);
 					}
-					temp_waypoint.mission_state = stof(str_buf4.substr(pos4+1));
+					temp_waypoint.mission_state = stof(str_buf4.substr(0,pos4));
 					
 					new_waypoints.push_back(temp_waypoint);
 
@@ -210,17 +209,18 @@ public:
 
 		new_waypoints_.assign(all_new_waypoints_[0].begin(),all_new_waypoints_[0].end());
 		size_ = lane_size_[0];
-		/*for (vector<int> vec : all_state_index_) {
+		for (vector<int> vec : all_state_index_) {
 			for (int num : vec) {
 				cout << num <<" ";
-		}
+			}
 		cout << endl;
-
+		}
+		/*
 		cout << all_state_index_.size() << endl;
 		//lane_number_ =0;
 		cout << lane_number_ << endl;*/
 
-		cout << all_state_index_.at(lane_number_).at(0) << endl;
+		//cout << all_state_index_.at(lane_number_).at(0) << endl;
 
 
 		
