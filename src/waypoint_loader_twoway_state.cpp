@@ -39,7 +39,8 @@ protected:
 
 	int size_;
 	int final_size_;
-	int state_inspection;	
+	int state_inspection_;	
+	int parking_state_;
 
 	vector<waypoint_maker::Waypoint> final_waypoints_;
 
@@ -66,7 +67,8 @@ public:
 	}
 	
 	void initSetup() {
-		private_nh_.getParam("/waypoint_loader_node/state_inspection", state_inspection);
+		private_nh_.getParam("/waypoint_loader_node/state_inspection", state_inspection_);
+		private_nh_.getParam("/waypoint_loader_node/parking_state", parking_state_);
 	
 		final_size_ = 30;
 
@@ -89,7 +91,7 @@ public:
 	}
 	
 	void stateCallback(const waypoint_maker::Waypoint::ConstPtr &msg){
-		state_inspection = msg->mission_state;
+		state_inspection_ = msg->mission_state;
 		lane_number_ = msg->lane_number;
 	}
 
@@ -233,26 +235,26 @@ public:
 		if(lane_number_ != ex_lane_number_){
 			private_nh_.setParam("/waypoint_follower_node/lane_final", lane_number_);
 			private_nh_.setParam("/waypoint_follower_node/first_state_index", all_state_index_.at(lane_number_).at(0));
-			private_nh_.setParam("/waypoint_follower_node/second_state_index", all_state_index_.at(lane_number_).at(0));
-			private_nh_.setParam("/waypoint_follower_node/third_state_index", all_state_index_.at(lane_number_).at(0));
+			private_nh_.setParam("/waypoint_follower_node/second_state_index", all_state_index_.at(lane_number_).at(1));
+			private_nh_.setParam("/waypoint_follower_node/third_state_index", all_state_index_.at(lane_number_).at(2));
 			new_waypoints_.clear();
 			new_waypoints_.assign(all_new_waypoints_[lane_number_].begin(),all_new_waypoints_[lane_number_].end());
 			size_ = lane_size_[lane_number_];
 			ex_lane_number_ = lane_number_;
 			if(lane_number_ ==0){
-			state_inspection == 3;
+			state_inspection_ == 3;
 			}
-			else state_inspection == 0;
+			else state_inspection_ == 0;
 		}
 
 
 		vector<int> closest_waypoint_candidates;
 		for(int i=0;i<size_;i++) {
 			float dist = calcPlaneDist(current_pose, new_waypoints_[i].pose);
-			if(state_inspection==0||state_inspection==1||state_inspection==2){
-				if(dist < max_search_dist_ && (new_waypoints_[i].mission_state==state_inspection)) closest_waypoint_candidates.push_back(i);
+			if(parking_state_==0||parking_state_==1||parking_state_==2){
+				if(dist < max_search_dist_ && (new_waypoints_[i].mission_state==parking_state_ + 1)) closest_waypoint_candidates.push_back(i);
 			}
-			else if(dist < max_search_dist_ && abs((new_waypoints_[i].mission_state - state_inspection)) <= 1 ) closest_waypoint_candidates.push_back(i);
+			else if(dist < max_search_dist_ && abs((new_waypoints_[i].mission_state - state_inspection_)) <= 1 ) closest_waypoint_candidates.push_back(i);
 		}
 		if(!closest_waypoint_candidates.empty()) {
 			int waypoint_min = -1;
